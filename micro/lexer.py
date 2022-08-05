@@ -7,7 +7,7 @@ class LexingError(Exception): pass
 
 class MicroLexer(Lexer):
     tokens = {
-        ID, VAR, CODE
+        ID, VAR, CODE, NUMBER, RETURN
     }
 
     ignore = " \t"
@@ -21,6 +21,7 @@ class MicroLexer(Lexer):
     ID = r"[a-zA-Z_][a-zA-Z_0-9]*"
     ID['code']  = CODE
     ID['var']   = VAR
+    ID['return']   = RETURN
 
     @_(r"\d+")
     def NUMBER(self, token: Token):

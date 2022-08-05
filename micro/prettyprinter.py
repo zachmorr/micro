@@ -1,3 +1,4 @@
+from pyclbr import Function
 from .ast import *
 
 
@@ -22,8 +23,8 @@ def visit_Module(node: Module, indent: int = 0):
     for declaration in node.declarations:
         prettyprint(declaration, indent)
 
-def visit_GlobalVar(node: GlobalVar, indent: int = 0):
-    prettyprint(node.declaration, indent)
+# def visit_GlobalVar(node: GlobalVar, indent: int = 0):
+#     prettyprint(node.declaration, indent)
 
 def visit_Code(node: Code, indent: int = 0):
     prettyprint(node.declaration, indent)
@@ -31,18 +32,50 @@ def visit_Code(node: Code, indent: int = 0):
 
 def visit_CodeDeclaration(node: CodeDeclaration, indent: int = 0):
     prettyprint(node.declaration, indent)
-    indented_print(indent, "Arguments")
     for arg in node.args:
+        indented_print(indent, "Argument")
         prettyprint(arg, indent+1)
 
 def visit_CodeDefinition(node: CodeDefinition, indent: int = 0):
     for statement in node.body:
-        prettyprint(statement, indent+1)
+        prettyprint(statement, indent)
+
+def visit_AssignmentExpression(node: AssignmentExpression, indent: int = 0):
+    prettyprint(node.lvalue, indent)
+    prettyprint(node.rvalue, indent)
+
+def visit_Return(node: Return, indent: int = 0):
+    prettyprint(node.retval, indent)
+
+def visit_FunctionCall(node: FunctionCall, indent: int = 0):
+    prettyprint(node.identifier, indent)
+    for arg in node.args:
+        indented_print(indent, "Argument")
+        prettyprint(arg, indent+1)
 
 def visit_VarDeclaration(node: VarDeclaration, indent: int = 0):
     prettyprint(node.declaration, indent)
 
 def visit_Declaration(node: Declaration, indent: int = 0):
-    indented_print(indent, f"Identifier: {node.identifier}")
-    indented_print(indent, f"Type: {node.type}")
+    prettyprint(node.identifier, indent)
+    prettyprint(node.type, indent)
+
+def visit_Identifier(node: Identifier, indent: int = 0):
+    indented_print(indent, node)
+
+def visit_Type(node: Type, indent: int = 0):
+    indented_print(indent, node)
+
+def visit_int(node: int, indent: int = 0):
+    indented_print(indent, node)
+
+def visit_str(node: str, indent: int = 0):
+    indented_print(indent, node)
+
+def visit_BinaryOperation(node: BinaryOperation, indent: int = 0):
+    prettyprint(node.left, indent)
+    prettyprint(node.op, indent)
+    prettyprint(node.right, indent)
+
+
 

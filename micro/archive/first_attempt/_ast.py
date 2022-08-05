@@ -8,7 +8,6 @@ class Declaration(ASTNode):
     name: str
     type: str
 
-
 @dataclass
 class ConstExpr(ASTNode):
     value: int
