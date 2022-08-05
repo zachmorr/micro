@@ -1,45 +1,39 @@
-from typing import List
+from typing import Any, List
 from dataclasses import dataclass
 
 class ASTNode: pass
 
+
 @dataclass
 class Declaration(ASTNode):
-    name: str
+    identifier: str
     type: str
 
+@dataclass
+class VarDeclaration(ASTNode):
+    declaration: Declaration
+    initializer: Any
 
 @dataclass
-class ConstExpr(ASTNode):
-    value: int
-
-@dataclass
-class CodeDef(ASTNode):
-    name: str
-    type: str
+class CodeDeclaration(ASTNode):
+    declaration: Declaration
     args: List[Declaration]
 
 @dataclass
-class CodeBody(ASTNode):
-    statements : list
+class CodeDefinition(ASTNode):
+    body: List
 
 @dataclass
 class Code(ASTNode):
-    declaration: Declaration
-    body: list
-
-@dataclass
-class Var(ASTNode):
-    declaration: Declaration
-    initializer: ConstExpr
+    declaration: CodeDeclaration
+    definition: CodeDefinition
 
 @dataclass
 class GlobalVar(ASTNode):
-    declaration: Declaration
-    initializer: ConstExpr
+    declaration: VarDeclaration
 
 @dataclass
 class Module(ASTNode):
-    globals: List[ASTNode]
+    declarations: List[ASTNode]
     name: str
 

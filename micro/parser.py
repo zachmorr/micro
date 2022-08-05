@@ -14,85 +14,97 @@ class MicroParser(Parser):
     debugfile = 'parser.out'
     current_module = None
 
-    @_("declaration : ID ':' ID")
+    @_("type : ID")
     def expr(self, p: YaccProduction):
-        return Declaration(p.ID0, p.ID1)
+        return p.ID
 
-    @_("arg_list : empty")
+    @_("identifier : ID")
     def expr(self, p: YaccProduction):
-        return []
-
-    @_("arg_list : declaration")
-    def expr(self, p: YaccProduction):
-        return [p.declaration]
-
-    @_("arg_list : arg_list ',' declaration")
-    def expr(self, p: YaccProduction):
-        return p.arg_list + [p.declaration]
-
-    @_("codedef : CODE ID '(' arg_list ')' ':' ID ")
-    def exper(self, p: YaccProduction):
-        return CodeDef(p.ID0, p.ID1, p.arg_list)
+        return p.ID
     
-    @_("var : VAR declaration")
+    @_("Declaration : identifier ':' type ")
     def expr(self, p: YaccProduction):
-        return Var(p.declaration, None)
+        return Declaration(p.identifier, p.type)
 
-    @_("statement : var")
-    def exper(self, p: YaccProduction):
-        return p.var
+    @_("VarDeclaration : VAR Declaration '=' initializer")
+    def expr(self, p: YaccProduction):
+        return VarDeclaration(p.Declaration, None)
 
-    @_("statements : empty")
-    def exper(self, p: YaccProduction):
-        return []
+    @_("VarDeclaration : VAR Declaration")
+    def expr(self, p: YaccProduction):
+        return VarDeclaration(p.Declaration, None)
 
-    @_("statements : statement")
-    def exper(self, p: YaccProduction):
-        return [p.statement]
+    @_("statement : VarDeclaration")
+    def expr(self, p: YaccProduction):
+        return p.VarDeclaration
 
     @_("statements : statements statement")
-    def exper(self, p: YaccProduction):
-        return p.statements + [p.statement]
-
-    @_("codebody : '{' statements '}'")
-    def exper(self, p: YaccProduction):
-        return p.statements
-
-    @_("code : codedef codebody")
-    def exper(self, p: YaccProduction):
-        return Code(p.codedef, p.codebody)
-
-    @_("globalvar : GLOBAL declaration")
-    def exper(self, p: YaccProduction):
-        return GlobalVar(p.declaration, None)
-
-    @_("glob : globalvar")
     def expr(self, p: YaccProduction):
-        return p.globalvar
+        return p[0] + [p[1]]
 
-    @_("glob : code")
+    @_("statements : statement")
     def expr(self, p: YaccProduction):
-        return p.code
+        return [p[0]]
 
-    @_("globals : globals glob")
+    @_("CodeDefinition : '{' statements '}'")
     def expr(self, p: YaccProduction):
-        return p.globals + [p.glob]
+        return CodeDefinition(p.statements)
 
-    @_("globals : glob")
+    @_("CodeDefinition : '{' '}'")
     def expr(self, p: YaccProduction):
-        return [p.glob]
+        return CodeDefinition([])
+
+    @_("arg : Declaration")
+    def expr(self, p: YaccProduction):
+        return p.Declaration
+
+    @_("arg : Declaration ','")
+    def expr(self, p: YaccProduction):
+        return p.Declaration
+
+    @_("arg_list : arg_list arg")
+    def expr(self, p: YaccProduction):
+        return p[0] + [p[1]]
+
+    @_("arg_list : arg")
+    def expr(self, p: YaccProduction):
+        return [p[0]]
+
+    @_("CodeDeclaration : CODE Declaration '(' arg_list ')'")
+    def expr(self, p: YaccProduction):
+        return CodeDeclaration(p.Declaration, p.arg_list)
+    
+    @_("CodeDeclaration : CODE Declaration '(' ')'")
+    def expr(self, p: YaccProduction):
+        return CodeDeclaration(p.Declaration, [])
+    
+    @_("Code : CodeDeclaration CodeDefinition")
+    def expr(self, p: YaccProduction):
+        return Code(p.CodeDeclaration, p.CodeDefinition)
+
+    @_("GlobalVar : VarDeclaration")
+    def expr(self, p: YaccProduction):
+        return GlobalVar(p.VarDeclaration)
+
+    @_("global : Code")
+    def expr(self, p: YaccProduction):
+        return p.Code
+
+    @_("global : GlobalVar")
+    def expr(self, p: YaccProduction):
+        return p.GlobalVar
+
+    @_("globals : globals global")
+    def expr(self, p: YaccProduction):
+        return p[0] + [p[1]]
+
+    @_("globals : global")
+    def expr(self, p: YaccProduction):
+        return [p[0]]
 
     @_("module : globals")
     def expr(self, p: YaccProduction):
         return Module(p.globals, self.current_module)
-
-    @_("module : error")
-    def expr(self, p: YaccProduction):
-        print_error('bad module!', self.source, p.lineno)
-
-    @_("")
-    def empty(self, p: YaccProduction):
-        pass
 
     def error(self, p: YaccProduction):
         print("Parse error!")

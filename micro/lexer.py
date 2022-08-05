@@ -7,10 +7,10 @@ class LexingError(Exception): pass
 
 class MicroLexer(Lexer):
     tokens = {
-        ID, GLOBAL, CODE, VAR,
+        ID, VAR, CODE
     }
 
-    ignore = r" \token"
+    ignore = " \t"
     ignore_comment = r'\#.*'
     literals = [
         '+', '-', '/', '*', '=',
@@ -19,13 +19,10 @@ class MicroLexer(Lexer):
     ]
 
     ID = r"[a-zA-Z_][a-zA-Z_0-9]*"
-    ID['global'] = GLOBAL
-    ID['code']   = CODE
+    ID['code']  = CODE
     ID['var']   = VAR
 
-    @_(r"0x[0-9a-fA-F]+",
-       r"0b[0-1]+",
-       r"\d+")
+    @_(r"\d+")
     def NUMBER(self, token: Token):
         token.value = int(token.value, 0)
         return token

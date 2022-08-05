@@ -1,9 +1,5 @@
 import logging
-from .ast import ASTNode
-from .ast import Module
-from .ast import GlobalVar
-from .ast import Declaration
-from .ast import ConstExpr
+from .ast import *
 from llvmlite import ir
 
 
@@ -38,13 +34,3 @@ class IRGenerator:
             self.codegen(glob, module)
 
         return module
-
-    def visit_GlobalVar(self, globalvar: GlobalVar, module: ir.Module):
-        type_name = globalvar.declaration.type
-        type = self.types[type_name]
-        name = globalvar.declaration.name
-        var = ir.GlobalVariable(module, type, name)
-        if globalvar.value:
-            value = ir.Constant(type, globalvar.value.value)
-            var.initializer = value
-        return var

@@ -6,55 +6,43 @@ def indented_print(indent: int, *args, **kwargs):
     print(*args, **kwargs)
 
 def prettyprint(node: ASTNode, indent: int = 0):
+    if node is None:
+        return
+    
     type_str = type(node).__name__
     function_name = f"visit_{type_str}"
     if function_name in globals():
-        globals()[function_name](node, indent)
+        indented_print(indent, type_str)
+        globals()[function_name](node, indent+1)
     else:
         print(f"No {function_name} prettyprinter implemented")
 
 def visit_Module(node: Module, indent: int = 0):
-    indented_print(indent, f"Module: {node.name}")
-    for glob in node.globals:
-        prettyprint(glob, indent+1)
+    indented_print(indent, f"Name: {node.name}")
+    for declaration in node.declarations:
+        prettyprint(declaration, indent)
 
 def visit_GlobalVar(node: GlobalVar, indent: int = 0):
-    indented_print(indent, f"GlobalVar:")
-    prettyprint(node.declaration, indent+1)
-    if node.initializer:
-        prettyprint(node.initializer, indent+1)
-    else:
-        indented_print(indent+1, f"initializer: None")
-
-def visit_Var(node: Var, indent: int = 0):
-    indented_print(indent, f"Var:")
-    prettyprint(node.declaration, indent+1)
-    if node.initializer:
-        prettyprint(node.initializer, indent+1)
-    else:
-        indented_print(indent+1, f"initializer: None")
-
-def visit_CodeDef(node: CodeDef, indent: int = 0):
-    indented_print(indent, f"CodeDef:")
-    indented_print(indent+1, f"Type: {node.type}")
-    indented_print(indent+1, f"Name: {node.name}")
-    if node.args:
-        indented_print(indent+1, f"Arguments:")
-        for arg in node.args:
-            prettyprint(arg, indent+2)
+    prettyprint(node.declaration, indent)
 
 def visit_Code(node: Code, indent: int = 0):
-    indented_print(indent, f"Code:")
-    prettyprint(node.declaration, indent+1)
-    if node.body:
-        indented_print(indent+1, f"Body:")
-        for line in node.body:
-            prettyprint(line, indent+2)
+    prettyprint(node.declaration, indent)
+    prettyprint(node.definition, indent)
+
+def visit_CodeDeclaration(node: CodeDeclaration, indent: int = 0):
+    prettyprint(node.declaration, indent)
+    indented_print(indent, "Arguments")
+    for arg in node.args:
+        prettyprint(arg, indent+1)
+
+def visit_CodeDefinition(node: CodeDefinition, indent: int = 0):
+    for statement in node.body:
+        prettyprint(statement, indent+1)
+
+def visit_VarDeclaration(node: VarDeclaration, indent: int = 0):
+    prettyprint(node.declaration, indent)
 
 def visit_Declaration(node: Declaration, indent: int = 0):
-    indented_print(indent, f"Declaration:")
-    indented_print(indent+1, f"Type: {node.type}")
-    indented_print(indent+1, f"Name: {node.name}")
+    indented_print(indent, f"Identifier: {node.identifier}")
+    indented_print(indent, f"Type: {node.type}")
 
-def visit_ConstExpr(node: ConstExpr, indent: int = 0):
-    indented_print(indent, f"Value: {node.value}")
