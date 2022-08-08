@@ -1,60 +1,33 @@
-from multiprocessing.sharedctypes import RawValue
 from typing import Any, List
 from dataclasses import dataclass
 
-class ASTNode: pass
-
-class Identifier(ASTNode, str): 
-    pass
-
-class Type(ASTNode, str): 
-    pass
+@dataclass
+class Declaration:
+    identifier: str
+    type: str
 
 @dataclass
-class Declaration(ASTNode):
-    identifier: Identifier
-    type: Type
-
-@dataclass
-class BinaryOperation(ASTNode):
+class BinaryOperation:
     left: Any
     op: str
     right: Any
 
 @dataclass
-class VarDeclaration(ASTNode):
-    declaration: Declaration
-
-@dataclass
-class Return(ASTNode):
-    retval: Any
-
-@dataclass
-class FunctionCall(ASTNode):
-    identifier: Identifier
-    args: list
-
-@dataclass
-class AssignmentExpression(ASTNode):
+class Assignment:
     lvalue: Any
     rvalue: Any
 
+class CodeDefinition(list): 
+    pass
+
 @dataclass
-class CodeDeclaration(ASTNode):
+class Code:
     declaration: Declaration
-    args: List[Declaration]
+    arguments: List[Declaration]
+    body: Any
 
 @dataclass
-class CodeDefinition(ASTNode):
-    body: List
+class Module:
+    external_declarations: list
 
-@dataclass
-class Code(ASTNode):
-    declaration: CodeDeclaration
-    definition: CodeDefinition
-
-@dataclass
-class Module(ASTNode):
-    declarations: List[ASTNode]
-    name: str = None
 
