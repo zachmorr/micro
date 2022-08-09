@@ -7,10 +7,10 @@ class MicroTransformer(Transformer):
         return Module(node)
 
     def code(self, node: Tree):
-        return Code(node[0][0], node[0][1], node[1])
+        return Code(node[0], node[1])
 
     def code_declaration(self, node: Tree):
-        return node[1], node[2]
+        return CodeDeclaration(node[1], node[2])
 
     def arg_declaration(self, node: Tree):
         return list(node)
@@ -19,10 +19,16 @@ class MicroTransformer(Transformer):
         return CodeDefinition(node)
     
     def assignment_expression(self, node: Tree):
-        return Assignment(node[0], node[1])
+        return AssignmentExpression(node[0], node[1])
+
+    def return_expression(self, node: Tree):
+        if len(node) == 1:
+            return Return(None)
+        else:
+            return Return(node[1])
 
     def var_declaration(self, node: Tree):
-        return node[1]
+        return VarDeclaration(node[1])
 
     def declaration(self, node: Tree):
         return Declaration(node[0], node[1])
@@ -40,10 +46,10 @@ class MicroTransformer(Transformer):
         return BinaryOperation(node[0], '+', node[1])
 
     def identifier(self, node: Tree):
-        return str(node[0])
+        return Identifier(node[0])
 
     def type(self, node: Tree):
-        return str(node[0])
+        return Type(node[0])
 
     def NUMBER(self, node: Tree):
         return int(node[0])

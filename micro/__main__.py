@@ -3,17 +3,16 @@ from argparse import ArgumentParser
 
 from .parser import parser
 from .compile import compile
+from .transformer import MicroTransformer
+from .prettyprinter import prettyprint
+from .jit import run
 
 def main():
     argparser = ArgumentParser(prog='Micro')
-    subargparser = argparser.add_subparsers(help='Select Command', dest='subargparser')
-
-    parse_argparser = subargparser.add_parser('parse')
-    parse_argparser.add_argument("file", help='File to run parser on', default='')
-
-    compile_argparser = subargparser.add_parser('compile')
-    compile_argparser.add_argument("file", help='File to run compiler on', default='')
-
+    argparser.add_argument("file", help='File to run parser on', default='')
+    argparser.add_argument("--lark", help="Display generated Lark Tree", action="store_true")
+    argparser.add_argument("--ast", help="Display AST", action="store_true")
+    argparser.add_argument("--ir", help="Display LLVM IR", action="store_true")
     args = argparser.parse_args()
     
     if len(sys.argv) < 2:
@@ -22,13 +21,20 @@ def main():
 
     with open(args.file) as file:
         text = file.read()
-    ast = parser.parse(text)
+    lark_ast = parser.parse(text)
 
-    if args.subargparser == "parse":
-        print(ast.pretty())
-    elif args.subargparser == "compile":
-        compile(args.file, ast)
+    if args.lark:
+        print(lark_ast.pretty())
+    
+    ast = MicroTransformer().transform(lark_ast)
+    if args.ast:
+        prettyprint(ast)
 
+    ir = compile(args.file, ast)
+    if args.ir:
+        print(ir)
+
+    run(ir)
 
 if __name__ == "__main__":
     main()

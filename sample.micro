@@ -1,0 +1,5 @@
+code main: int (a: int){
+    var local: int = a
+    return local
+}
+

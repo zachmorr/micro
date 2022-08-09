@@ -19,10 +19,10 @@ arguments: identifier
 ?statement: var_declaration
          | assignment_expression
          | function_call
-         | return
+         | return_expression
 
-return: RETURN
-      | RETURN expression
+return_expression: RETURN
+                 | RETURN expression
 
 assignment_expression: lvalue "=" rvalue
 
