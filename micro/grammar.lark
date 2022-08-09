@@ -1,6 +1,7 @@
 // imports WORD from library
 %import common.DIGIT
 %import common.LETTER
+%import common.ESCAPED_STRING
 %import common.WS
 %ignore WS
 
@@ -13,8 +14,8 @@ code_declaration: CODE declaration arg_declaration
 arg_declaration: "(" [declaration ("," declaration)*] ")"
 code_definition: "{" statement* "}"
 
-function_call: identifier "(" [arguments ("," arguments)*] ")"
-arguments: identifier
+function_call: identifier function_args
+function_args: "(" [rvalue ("," rvalue)*] ")"
 
 ?statement: var_declaration
          | assignment_expression
@@ -31,10 +32,13 @@ assignment_expression: lvalue "=" rvalue
 
 ?rvalue: expression
 
-?unary: NUMBER
+?unary: constant
      | identifier
      | function_call
      | "(" expression ")"
+
+constant: NUMBER
+        | STRING
 
 ?expression: addative
 ?addative: multiplicative
@@ -57,6 +61,7 @@ declaration: identifier ":" type
 type: ID
 identifier: ID
 
+STRING: ESCAPED_STRING
 CODE: "code"
 VAR: "var"
 RETURN: "return"

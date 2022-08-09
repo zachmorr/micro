@@ -70,6 +70,12 @@ def visit_int(node: int, indent: int = 0):
 def visit_str(node: str, indent: int = 0):
     indented_print(indent, node)
 
+def visit_Tree(node: Tree, indent: int = 0):
+    print(node.pretty())
+
+def visit_Constant(node: Constant, indent: int = 0):
+    indented_print(indent, node.value)
+
 def visit_BinaryOperation(node: BinaryOperation, indent: int = 0):
     prettyprint(node.left, indent)
     prettyprint(node.op, indent)

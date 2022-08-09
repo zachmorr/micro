@@ -1,4 +1,5 @@
 import llvmlite.binding as llvm
+from ctypes import CFUNCTYPE, c_void_p
 
 def run(ir: str):
     llvm.initialize()
@@ -7,7 +8,6 @@ def run(ir: str):
 
     target = llvm.Target.from_default_triple()
     target_machine = target.create_target_machine()
-    # And an execution engine with an empty backing module
     backing_mod = llvm.parse_assembly("")
     engine = llvm.create_mcjit_compiler(backing_mod, target_machine)
 
@@ -19,9 +19,7 @@ def run(ir: str):
     engine.run_static_constructors()
 
     main_ptr = engine.get_function_address("main")
+    main = CFUNCTYPE(c_void_p)(main_ptr)
 
-    print("Executing Main:")
-    from ctypes import CFUNCTYPE, c_int32
-    cfunc = CFUNCTYPE(c_int32, c_int32)(main_ptr)
-    result = cfunc(3)
-    print(result)
+    print(f"Executing main() (0x{main_ptr:x}):")
+    main()

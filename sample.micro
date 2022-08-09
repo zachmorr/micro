@@ -1,5 +1,13 @@
-code main: int (a: int){
-    var local: int = a
-    return local
+code print: void (size: int) {
+    printf("str: %.*s\n\x00", size, "test")
+    printf("num: %d\n\x00", size)
+    return
 }
+
+code main: void (){
+    var local: int = 4
+    print(local)
+    return
+}
+
 

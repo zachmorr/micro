@@ -11,6 +11,10 @@ class Type(ASTNode, str):
     pass
 
 @dataclass
+class Constant(ASTNode):
+    value: Any
+
+@dataclass
 class Declaration(ASTNode):
     identifier: Identifier
     type: Type

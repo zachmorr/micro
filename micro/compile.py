@@ -1,3 +1,4 @@
+from lib2to3.pygram import Symbols
 import logging
 from typing import List
 from llvmlite import ir
@@ -22,8 +23,9 @@ def compile(module_name: str, ast: tuple):
 class IRGenerator:
     # Default types
     types = {
-        "byte": ir.IntType(8),
         "int": ir.IntType(32),
+        "void": ir.VoidType(),
+        "ptr": ir.PointerType(ir.VoidType()),
     }
 
     # Defined symbols
@@ -32,11 +34,16 @@ class IRGenerator:
     context: ir.Context
     module: ir.Module
     builder: ir.IRBuilder
+    constcounter: int = 0
 
     def __init__(self, module: str):
         self.module = ir.Module(module)
         self.builder = ir.IRBuilder()
-        
+
+        # import printf
+        func_type = ir.FunctionType(ir.IntType(32), [ir.PointerType(ir.IntType(8))], var_arg=True)
+        printf = ir.Function(self.module, func_type, "printf")
+        self.symbol_table["printf"] = printf
 
     def codegen(self, node, *args):
         type_str = type(node).__name__
@@ -55,9 +62,6 @@ class IRGenerator:
         return self.module
 
     def visit_Code(self, code: Code):
-        # Save current symbol table
-        old_symbols = self.symbol_table.copy()
-
         # Create function
         function = self.codegen(code.declaration)
         entry_block = function.append_basic_block(name="entry")
@@ -70,8 +74,9 @@ class IRGenerator:
             self.builder.store(arg, ptr)
             self.symbol_table[name] = ptr
 
-        # entry_block = self.builder.append_basic_block(name="entry")
-        # self.builder.position_at_start(entry_block)
+        # Save current symbol table
+        old_symbols = self.symbol_table.copy()
+
         self.codegen(code.definition)
 
         # Revert to old symbol table
@@ -95,15 +100,41 @@ class IRGenerator:
             name = arg.identifier
             function.args[index].name = name
 
+        self.symbol_table[identifier] = function
         return function
 
     def visit_CodeDefinition(self, definition: CodeDefinition):
         for statement in definition.body:
             self.codegen(statement)
 
+    def visit_FunctionCall(self, function_call: FunctionCall):
+        args = []
+        for arg in function_call.args:
+            args.append(self.codegen(arg))
+
+        name = function_call.identifier
+        function = self.symbol_table[name]
+        self.builder.call(function, args)
+
+    def visit_Constant(self, constant: Constant):
+        value = constant.value
+        if isinstance(value, bytes):
+            string = bytearray(value)
+            stringtype = ir.ArrayType(ir.IntType(8), len(string))
+            const = ir.Constant(stringtype,string)
+
+            var = ir.GlobalVariable(self.module, stringtype, f"const{self.constcounter}")
+            var.global_constant = True
+            var.initializer = const
+            self.constcounter += 1
+
+            index = ir.IntType(32)(0)
+            ptr = self.builder.gep(var, [index, index])
+            return ptr
+        elif isinstance(value, int):
+            return ir.IntType(32)(value)
+
     def visit_AssignmentExpression(self, assignment: AssignmentExpression):
-        # assignment_block = self.builder.append_basic_block(name="assignment")
-        # self.builder.position_at_start(assignment_block)
         rvalue = self.codegen(assignment.rvalue)
         lvalue = self.codegen(assignment.lvalue)
 
@@ -111,10 +142,10 @@ class IRGenerator:
 
     def visit_Return(self, ret: Return):
         if ret.expression is None:
-            self.builder.ret(None)
-
-        rvalue = self.codegen(ret.expression)
-        self.builder.ret(rvalue)
+            self.builder.ret_void()
+        else:
+            rvalue = self.codegen(ret.expression)
+            self.builder.ret(rvalue)
 
     def visit_Identifier(self, identifier: Identifier):
         ptr = self.symbol_table[identifier]
