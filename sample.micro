@@ -1,13 +1,19 @@
-code print: void (size: int) {
-    printf("str: %.*s\n\x00", size, "test")
-    printf("num: %d\n\x00", size)
-    return
+
+
+function print(num: byte) {
+    printf("num: %d\n\x00", num)
 }
 
-code main: void (){
-    var local: int = 4
-    print(local)
-    return
+function print_arr(array: byte[]): int {
+    print(arr.size)
+    print(arr[0])
+    print(arr[1])
+    print(arr[2])
+    return 1
 }
 
-
+function main {
+    var array: byte[3] = [1,2,3]
+    var return: int = print_arr(array)
+    return
+}

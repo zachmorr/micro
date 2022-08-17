@@ -1,0 +1,51 @@
+### Value Variable Definitions
+a: u32                  // No initialization
+a: u32 = 2              // Integer constant initialization
+a: float = 2.2          // Floating point constant initialization
+a: u8 = "!"             // Character constant initialization
+
+### Referance Variable Definitions
+## Arrays
+a: u32[10]              // Compile time array
+a: u8[] = [1,2,3]       // Compile time array literal initialization
+a: u8[] = "string"      // Compile time string literal initialization
+a: u8[x]                // Runtime array initialization
+
+## Structs
+define Data as {
+    a: u8,
+    b: u32,
+}
+
+a: Data
+a.a = 1
+a.b = 2
+a: Data = {1, 2}
+a: Data = {c, d}
+
+### Function Definitions
+# Micro
+function main(arg0, ..., argN): returnType
+
+# IR
+define u8 @"main"(returnType* %ret, arg0, ..., argN)
+
+# Examples
+function main()         // No argument or return
+define i32 @"main"()
+
+function main(a: u8): u32           // Integer argument and return
+define i32 @"main"(i32* %ret, i8 %a)
+
+function main(a: u8[]): u32[]       // Array argument and return
+define i32 @"main"({i32, [0 x i32]}* %ret, {i32, [0 x i8]}* %a)
+
+function main(a: u8): u32, u32       // Multiple return
+define i32 @"main"({i32, i32}* %ret, i8 %a)
+
+
+
+function test(): u32, u32
+a,b = test()
+
+%1 = alloca {i32, i32}

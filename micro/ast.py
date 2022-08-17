@@ -4,60 +4,31 @@ from dataclasses import dataclass
 
 class ASTNode: pass
 
-class Identifier(ASTNode, str): 
-    pass
-
-class Type(ASTNode, str): 
-    pass
+class Type(ASTNode, str): pass
 
 @dataclass
-class Constant(ASTNode):
-    value: Any
+class ArrayType(ASTNode):
+    data_type: Type
+
+class StatementList(ASTNode, list): pass
 
 @dataclass
-class Declaration(ASTNode):
-    identifier: Identifier
-    type: Type
+class ArgumentDeclaration(ASTNode):
+    name: str
+    type: Any
 
 @dataclass
-class BinaryOperation(ASTNode):
-    left: Any
-    op: str
-    right: Any
+class FunctionDeclaration(ASTNode):
+    name: str
+    return_type: Any
+    args: List[ArgumentDeclaration]
 
 @dataclass
-class VarDeclaration(ASTNode):
-    declaration: Declaration
-
-@dataclass
-class Return(ASTNode):
-    expression: Any
-
-@dataclass
-class FunctionCall(ASTNode):
-    identifier: Identifier
-    args: list
-
-@dataclass
-class AssignmentExpression(ASTNode):
-    lvalue: Any
-    rvalue: Any
-
-@dataclass
-class CodeDeclaration(ASTNode):
-    declaration: Declaration
-    args: List[Declaration]
-
-@dataclass
-class CodeDefinition(ASTNode):
-    body: List
-
-@dataclass
-class Code(ASTNode):
-    declaration: CodeDeclaration
-    definition: CodeDefinition
+class Function(ASTNode):
+    declaration: FunctionDeclaration
+    definition: StatementList
 
 @dataclass
 class Module(ASTNode):
-    external_declarations: List[ASTNode]
+    external_declarations: list
 

@@ -1,33 +1,7 @@
 from llvmlite import ir
 import llvmlite.binding as llvm
 
-# module = ir.Module("test")
-# builder = ir.IRBuilder()
 
-# string = b'Output: %d'
-# string = bytearray(string)
-# stringtype = ir.ArrayType(ir.IntType(8), len(string))
-# consttype = ir.Constant(stringtype,string)
-# fmt = ir.GlobalVariable(module, stringtype, 'fmt')
-# fmt.global_constant = True
-# fmt.initializer = consttype
-
-# func_type = ir.FunctionType(ir.IntType(32), [ir.PointerType(ir.IntType(8))], var_arg=True)
-# printf = ir.Function(module, func_type, "printf")
-
-# func_type = ir.FunctionType(ir.VoidType(), [])
-# main = ir.Function(module, func_type, "main")
-
-# block = main.append_basic_block("entry")
-# builder.position_at_start(block)
-# index = ir.IntType(32)(0)
-# ptr = builder.gep(fmt, [index, index])
-
-# number = ir.IntType(32)(10)
-# builder.call(printf, [ptr, number])
-# builder.ret_void()
-
-# llvmir = str(module)
 llvmir = """
 ; ModuleID = ".\sample.micro"
 target triple = "unknown-unknown-unknown"

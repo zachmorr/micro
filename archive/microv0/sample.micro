@@ -1,0 +1,13 @@
+code print: void (array: byte[]) {
+    printf("num: %d\n\x00", array[0])
+    return
+}
+
+code main: void (){
+    var array: byte[3]
+    array[0] = 0 
+    array[1] = 0 
+    array[2] = 0 
+    print(array)
+    return
+}

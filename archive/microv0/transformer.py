@@ -60,6 +60,9 @@ class MicroTransformer(Transformer):
     def constant(self, node: Tree):
         return Constant(node[0])
 
+    def array_type(self, node: Tree):
+        return ArrayType(node[0], node[1])
+
     def identifier(self, node: Tree):
         return Identifier(node[0])
 
@@ -73,4 +76,7 @@ class MicroTransformer(Transformer):
         return string
 
     def NUMBER(self, node: Tree):
-        return int(node[0])
+        return int(node)
+
+    def ID(self, node: Tree):
+        return str(node)

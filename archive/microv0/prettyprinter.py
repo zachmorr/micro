@@ -81,6 +81,9 @@ def visit_BinaryOperation(node: BinaryOperation, indent: int = 0):
     prettyprint(node.op, indent)
     prettyprint(node.right, indent)
 
+def visit_ArrayType(node: ArrayType, indent: int = 0):
+    prettyprint(node.type, indent)
+    prettyprint(node.size, indent)
 
 
 

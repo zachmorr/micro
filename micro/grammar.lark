@@ -1,69 +1,30 @@
 // imports WORD from library
 %import common.DIGIT
-%import common.LETTER
+%import common.INT
+%import common.SIGNED_INT
+%import common.SIGNED_FLOAT
 %import common.ESCAPED_STRING
+%import common.SH_COMMENT
 %import common.WS
+
 %ignore WS
+%ignore SH_COMMENT
 
 
 start: extern_declaration*
-?extern_declaration: code
+?extern_declaration: function
 
-code: code_declaration code_definition
-code_declaration: CODE declaration arg_declaration
-arg_declaration: "(" [declaration ("," declaration)*] ")"
-code_definition: "{" statement* "}"
 
-function_call: identifier function_args
-function_args: "(" [rvalue ("," rvalue)*] ")"
 
-?statement: var_declaration
-         | assignment_expression
-         | function_call
-         | return_expression
 
-return_expression: RETURN
-                 | RETURN expression
+declarator: IDENTIFIER
+        | 
 
-assignment_expression: lvalue "=" rvalue
-
-?lvalue: identifier
-      | var_declaration
-
-?rvalue: expression
-
-?unary: constant
-     | identifier
-     | function_call
-     | "(" expression ")"
-
-constant: NUMBER
-        | STRING
-
-?expression: addative
-?addative: multiplicative
-        | add
-        | subtract
-
-add: addative "+" multiplicative
-subtract: addative "-" multiplicative
-
-?multiplicative : unary
-               | multiply
-               | subtract
-
-multiply: multiplicative "*" unary
-divide: multiplicative "/" unary   
-
-var_declaration: VAR declaration
-
-declaration: identifier ":" type
-type: ID
-identifier: ID
-
-STRING: ESCAPED_STRING
-CODE: "code"
+// Base types
+FUNCTION: "function"
 VAR: "var"
 RETURN: "return"
-ID: ("_"|LETTER) ("_"|LETTER|DIGIT)*
-NUMBER: DIGIT+
+IDENTIFIER: ("_"|LETTER) ("_"|LETTER|DIGIT)*
+SINT: SIGNED_INT
+FLOAT: SIGNED_FLOAT
+STRING: ESCAPED_STRING

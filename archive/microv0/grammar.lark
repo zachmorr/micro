@@ -1,0 +1,70 @@
+// imports WORD from library
+%import common.DIGIT
+%import common.LETTER
+%import common.ESCAPED_STRING
+%import common.WS
+%ignore WS
+
+
+start: extern_declaration*
+?extern_declaration: code
+
+code: code_declaration code_definition
+code_declaration: CODE declaration arg_declaration
+arg_declaration: "(" [declaration ("," declaration)*] ")"
+code_definition: "{" statement* "}"
+
+function_call: identifier function_args
+function_args: "(" [rvalue ("," rvalue)*] ")"
+
+?statement: var_declaration
+         | assignment_expression
+         | function_call
+         | return_expression
+
+return_expression: RETURN
+                 | RETURN expression
+
+assignment_expression: lvalue "=" rvalue
+
+?lvalue: identifier
+      | var_declaration
+
+?rvalue: expression
+
+?unary: constant
+     | identifier
+     | function_call
+     | "(" expression ")"
+
+constant: NUMBER
+        | STRING
+
+?expression: addative
+?addative: multiplicative
+        | add
+        | subtract
+
+add: addative "+" multiplicative
+subtract: addative "-" multiplicative
+
+?multiplicative : unary
+               | multiply
+               | subtract
+
+multiply: multiplicative "*" unary
+divide: multiplicative "/" unary   
+
+var_declaration: VAR declaration
+
+declaration: identifier ":" (array_type | type)
+array_type: ID "[" NUMBER "]"
+type: ID
+identifier: ID
+
+STRING: ESCAPED_STRING
+CODE: "code"
+VAR: "var"
+RETURN: "return"
+ID: ("_"|LETTER) ("_"|LETTER|DIGIT)*
+NUMBER: DIGIT+
